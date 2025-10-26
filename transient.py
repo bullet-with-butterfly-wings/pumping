@@ -7,8 +7,50 @@ import os
 
 
 plotting = False
-path = Path("rabi3/detuning")  # Change to desired path
+path = Path("rabi3/oscillations_pretty")  # Change to desired path
 
+import numpy as np
+from scipy.optimize import curve_fit
+
+# rabi_decay(t, A, tau, omega, phi, offset) must already be defined
+
+def fit_with_score(x, y, p0):
+    popt, pcov = curve_fit(rabi_decay, x, y, p0=p0, maxfev=10000)
+    yhat = rabi_decay(x, *popt)
+    n = len(y); k = len(popt)
+    ssr = np.sum((y - yhat)**2)
+    # AIC and small-sample correction (AICc)
+    aic = n * np.log(ssr / n) + 2*k
+    aicc = aic + (2*k*(k+1)) / max(n - k - 1, 1)
+    return popt, pcov, ssr, aicc
+
+def weighted_avg_params(datasets, p0):
+    """
+    datasets: iterable of (x, y), e.g. [(df1[:,0], df1[:,1]), (df2[:,0], df2[:,1]), ...]
+    returns: (p_mean, weights, all_popt)
+    """
+    results = []
+    for (x, y) in datasets:
+        try:
+            popt, pcov, ssr, aicc = fit_with_score(x, y, p0)
+            results.append((popt, aicc))
+        except Exception:
+            # if a fit fails, skip it (weight = 0)
+            continue
+
+    if not results:
+        raise RuntimeError("All fits failed.")
+
+    # Convert AICc to Akaike weights
+    aiccs = np.array([r[1] for r in results])
+    dA = aiccs - np.min(aiccs)
+    w = np.exp(-0.5 * dA)
+    w /= np.sum(w)
+
+    popts = np.array([r[0] for r in results])  # shape: (m, k)
+    p_mean = np.average(popts, axis=0, weights=w)
+
+    return p_mean, w, popts
 
 
 def rabi_decay(t, A, B, C, D, E):
@@ -22,7 +64,7 @@ if is_detuning:
 else:
     scanning_range = sorted(list(filter(lambda x: "." not in x, os.listdir(path))), key=lambda x: int(x))
 
-scanning_range = scanning_range[:7]  # Use all voltages
+#scanning_range = scanning_range[:7]  # Use all voltages
 frequencies = []
 lifetimes = []
 amplitude = []
@@ -37,13 +79,12 @@ for parameter in scanning_range:
     frequencies_sample = []
     lifetime_sample = [] #data from this voltage
     amplitude_sample = []
-    total = None
 
     for wavefront in files:
         df = pd.read_csv(path/ parameter / wavefront, skiprows=1).to_numpy()
         mask = (df[:, 2] > 0) # only oscillations
         df = df[mask]
-        #df = df[:1000,:]
+        df = df[:2000,:]
         try:
             popt, pcov = curve_fit(rabi_decay, df[:, 0], df[:, 1], p0=[200, 1, 6.28, 0, 0])
         except (RuntimeError, ValueError, Warning) as e:
@@ -59,7 +100,7 @@ for parameter in scanning_range:
         else:
             total += df[:7000, 1]
         """
-        if plotting:
+        if parameter == "12":
             plt.plot(df[:, 0], df[:, 1], label=wavefront)
             plt.plot(df[:, 0], rabi_decay(df[:, 0], *popt), label=f"Fit {wavefront}")
             plt.xlabel("Time [ms]")
@@ -72,7 +113,15 @@ for parameter in scanning_range:
     lifetimes_error.append(np.std(lifetime_sample))
     amplitude.append(np.mean(amplitude_sample))
     amplitude_error.append(np.std(amplitude_sample))
-
+    #histograms of the frequencies sample, plot mean and std
+    plt.hist(frequencies_sample, bins=10)
+    plt.axvline(np.mean(frequencies_sample), color='r', linestyle='dashed', linewidth=1)
+    plt.axvline(np.mean(frequencies_sample) + np.std(frequencies_sample), color='g', linestyle='dashed', linewidth=1)
+    plt.axvline(np.mean(frequencies_sample) - np.std(frequencies_sample), color='g', linestyle='dashed', linewidth=1)
+    plt.title(f"Histogram of Rabi Frequencies for parameter {parameter}")
+    plt.xlabel("Rabi Frequency [kHz]")
+    plt.ylabel("Counts")
+    plt.show()
 buffer = []
 if is_detuning:
     for v in scanning_range:

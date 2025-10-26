@@ -37,3 +37,7 @@ Rabi - 23/10
     Offset: 50kHz baseline, steps of 1 kHz on both sides? (max offset 5), 10Hz and 500us window
     10Hz so I am sure it decays
     
+Rabi - 24/10
+    Data analysis, git repo init, making some plots
+    the fitting depends on the period of time you give it - short=> not enough oscillations, long => overfits the flat tail, only decay
+    playing around with the straight signal - signal 80mV, offset 3.5V, time constantintroduces offset
