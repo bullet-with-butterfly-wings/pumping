@@ -41,3 +41,18 @@ Rabi - 24/10
     Data analysis, git repo init, making some plots
     the fitting depends on the period of time you give it - short=> not enough oscillations, long => overfits the flat tail, only decay
     playing around with the straight signal - signal 80mV, offset 3.5V, time constantintroduces offset
+
+Power Broadening - 27/10
+    Using 90kHz so it fits on the screen, two sets of measurement
+    I think height saturates and width is non-zero at zero
+    Slighlty worried about the time constant on the device and the shape of the peaks
+    You can calibrate magnetic field with the known gf
+    Looking at double photon - tuned 100kHz, Gain 1000 (max), what should I measure??
+    Voltage B-sweep magnitude 0.750-0.792 V, Horizontal off (0.001), time of sweep 10s
+    Well, the graph with the power broadening is wrong...
+    For double photons, maybe I should set it to 100kHz, and then look for it
+    I checked the second harmonics, documents
+    Maxed gain for small ones (0.1, 0.2), half of the max gain (0.4) 50s sweep
+    Go 100s sweep, max gain/5 = 200, for 0.8 and 1.6
+
+
