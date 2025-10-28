@@ -43,7 +43,7 @@ Rabi - 24/10
     playing around with the straight signal - signal 80mV, offset 3.5V, time constantintroduces offset
 
 Power Broadening - 27/10
-    Using 90kHz so it fits on the screen, two sets of measurement
+    Using 90kHz so it fits on the screen, two sets of measurement (wrong point)
     I think height saturates and width is non-zero at zero
     Slighlty worried about the time constant on the device and the shape of the peaks
     You can calibrate magnetic field with the known gf
@@ -54,5 +54,13 @@ Power Broadening - 27/10
     I checked the second harmonics, documents
     Maxed gain for small ones (0.1, 0.2), half of the max gain (0.4) 50s sweep
     Go 100s sweep, max gain/5 = 200, for 0.8 and 1.6
+    Figured what was wrong with the power broadening - need to have time constant the same for the whole time + gain the same
+    Go with time of sweep 20s and whatever gain is convenient
+    Add one more point for 50mV (gradient is going to be 2 then) Max gain, time constant 1s, 50s sweep time
+    I think I can do better with the power broadening
 
+
+Rabi - 28/10
+    Need to finish for Rb87
+    50kHz, 100gain, looking at the positive, 10Hz, so it "saturates"
 
