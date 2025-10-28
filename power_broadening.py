@@ -8,7 +8,7 @@ import os
 from scipy.signal import argrelextrema
 
 
-path = Path("power_broadening/90_new")  # Change to desired path
+path = Path("power_broadening/big")  # Change to desired path
 
 def sorting_key(file_name):
     name = file_name.split(".")[0].split("-")
@@ -22,7 +22,6 @@ calibration_files = list(filter(lambda x: "calibration" in x, files))
 files = list(filter(lambda x: "calibration" not in x, files))
 start_time = 0.3 #s
 print(files)
-files = files[-2:]
 def peak_profile(x, height0, width0, pos0, offset): #Lorentzian profile
     return -height0 / (1 + ((x - pos0) / width0) ** 2) + offset
 
@@ -34,12 +33,16 @@ peaks_name = ["Double photon"]
 heights = {"Double photon": []}
 widths = {"Double photon": []}
 """
-calibration_happening = False
+peaks_name = ["Main"]
+heights = {"Main": []}
+widths = {"Main": []}
+
 peaks = []
 for power in files:
     df = pd.read_csv(path / power, skiprows=2).apply(pd.to_numeric, errors='coerce').dropna().to_numpy()
     mask = (df[:, 0] >= start_time)
     df = df[mask]
+    """
     if power == "0.20.csv" or power == "0.10.csv":
         df[:, 0] = df[:, 0]/2.5
     if power == "0-40.csv":
@@ -50,6 +53,7 @@ for power in files:
         df[:, 0] = df[:, 0]/2
     if sorting_key(power) > 1.7:
         df[:,1] = 10*df[:,1]
+    """
     if len(peaks) == 0:
         peaks, properties = scipy.signal.find_peaks(-df[:, 1], height=0.2, distance=1000, prominence=0.2, width=200)
     else:
@@ -80,7 +84,7 @@ for power in files:
     plt.ylabel("Signal [V]")
     plt.title(f"Drive: {power.split('.')[0]} V")
     plt.legend()
-    plt.close()
+    plt.show()
 
 label = ["Heights", "Widths"]
 for i, parameter in enumerate([heights, widths]):
@@ -103,3 +107,8 @@ for i, parameter in enumerate([heights, widths]):
     plt.legend()
     plt.show()
     
+
+#gains and times of sweep
+#Big one
+#For 25mV, 50mV, used max gain (1000), 3s time constant
+gains = [20, 20, 20, 20, 20, 20, 20, 20, 50, 100,  500, 1000, 1000]

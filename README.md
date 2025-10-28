@@ -63,4 +63,13 @@ Power Broadening - 27/10
 Rabi - 28/10
     Need to finish for Rb87
     50kHz, 100gain, looking at the positive, 10Hz, so it "saturates"
+    Noise is present event for the empty cable = it comes from the machine
+    Repeat for Rb85, because the data for 87 are way too good
+    50kHz, 20gain, positive, 10Hz
 
+Power - 28/10
+    Speedrun, focus on one, record gain and timesweep
+    3s time constant, 150kHz, so I do not see background
+    Constant drift up
+    Graphs looks good, be carefull about the units
+    The amplitude was changing because of detuning
