@@ -4,7 +4,7 @@ e1 - 17/10
     Time sweep 10s
     Gradient for B field signal 2.79 V/s
     Max Range
-    Frequency in kHz
+    Frequency in #kHz
 Results:
 Small peaks - I = 3/2 - Rb87
 Big Peaks - I = 5/2 - Rb85
@@ -13,7 +13,7 @@ Did not cancel out magnetic field properly
 e2 - 20/10
     Rotated the frame, now it is good ig (second data)
     Same settings
-    0 ohm for horizontal + sweep at 4.674 = 0.281 
+    0 ohm for horizontal + sweep at 4.674 = 0.281 G 
     0.265V for vertical = 0.159 G
     Total B = 0.32 G
     Straight through
@@ -72,4 +72,6 @@ Power - 28/10
     3s time constant, 150kHz, so I do not see background
     Constant drift up
     Graphs looks good, be carefull about the units
-    The amplitude was changing because of detuning
+    The amplitude was changing because of detuning, and the lifetime changes because of the dephasing or whatever (decreasing)
+    87 works better because SNR is better (HIGHER GAIN). The noise is coming from the machine
+    Idk how to rid of the detuning
