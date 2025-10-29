@@ -46,12 +46,13 @@ Power Broadening - 27/10
     Using 90kHz so it fits on the screen, two sets of measurement (wrong point)
     I think height saturates and width is non-zero at zero
     Slighlty worried about the time constant on the device and the shape of the peaks
+    Well, the graph with the power broadening is wrong...
     You can calibrate magnetic field with the known gf
     Looking at double photon - tuned 100kHz, Gain 1000 (max), what should I measure??
     Voltage B-sweep magnitude 0.750-0.792 V, Horizontal off (0.001), time of sweep 10s
-    Well, the graph with the power broadening is wrong...
     For double photons, maybe I should set it to 100kHz, and then look for it
     I checked the second harmonics, documents
+    
     Maxed gain for small ones (0.1, 0.2), half of the max gain (0.4) 50s sweep
     Go 100s sweep, max gain/5 = 200, for 0.8 and 1.6
     Figured what was wrong with the power broadening - need to have time constant the same for the whole time + gain the same
@@ -75,3 +76,18 @@ Power - 28/10
     The amplitude was changing because of detuning, and the lifetime changes because of the dephasing or whatever (decreasing)
     87 works better because SNR is better (HIGHER GAIN). The noise is coming from the machine
     Idk how to rid of the detuning
+
+Last day - 29/10
+    Doing the last peak broadening (small 87), 50s sweep time, 150kHz, 3 s time constant
+    For small 0-02 value, we used 20s sweep time (drift is not that bad), 1 s time constant
+    B sweep - 0.733 - 0.847 V?
+
+    Rabi - idk which peak, 50.5 kHz (hopefully fine), gain 200
+
+    Coils horizontal - distance 16.0 cm, diameter 31.1 cm, 
+    Coils vertical - 22.7 cm diameter, 12 cm distance, 
+
+    Double photon - Needed to go 200kHz and to avoid overlap, 0.857 - 1.034 V sweep coil and, sweep time 50s
+    weird exponent
+    Omg triple peaks - max gain, 20s sweep time, 300kHz, sweep field 0.623-0.454V
+    

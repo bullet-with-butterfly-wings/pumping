@@ -6,7 +6,7 @@ from scipy.optimize import curve_fit
 import os
 
 
-paths = [Path("rabi87"), Path("rabi85")]
+paths = [Path("new_rabi")]
 
 
 def rabi_decay(t, A, B, C, D, E):
