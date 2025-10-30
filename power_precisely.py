@@ -7,7 +7,7 @@ from scipy.optimize import curve_fit
 from scipy.signal import argrelextrema
 
 
-path = Path("two_photon/87")  # Change to desired path
+path = Path("triple")  # Change to desired path
 
 def sorting_key(file_name):
     name = file_name.split(".")[0].split("-")
@@ -19,12 +19,12 @@ def sorting_key(file_name):
         return int(name[0])
 
 files = sorted([f.name for f in path.glob("*.csv")], key=sorting_key, reverse=True)  # Sort by file name
-start_time = 5 #s
-end_time = 50 #s
+start_time = 8 #s
+end_time = 15 #s
 print(files)
 
 def peak_profile(x, height0, width0, pos0, offset, drift, extra_drift): #Lorentzian profile
-    return -height0 / (1 + ((x - pos0) / width0) ** 2) + offset + drift*x #+ extra_drift*x**2
+    return -abs(height0) / (1 + ((x - pos0) / width0) ** 2) + offset + drift*x  #+extra_drift*x**2
 
 def power_law(x, a, b):
     return a * x**b 
@@ -32,6 +32,7 @@ peaks = []
 gains = {"big": [20, 20, 20, 20, 20, 20, 20, 20, 50, 100, 500, 1000_000, 1000_000], 
          "87": [1000]*13,
          "85": [1000]*13, 
+         "triple": [1000, 1000, 1000, 1000_000], 
          "small": [100, 200, 200, 200, 500,500,500, 500, 1000,1000, 1000,1000,1000]}
 
 
@@ -43,16 +44,22 @@ for power in files:
     mask = (df[:, 0] >= start_time) & (df[:, 0] <= end_time)
     df = df[mask]
     df[:,1] = df[:, 1]/gains[path.name][files.index(power)]
+    print(gains[path.name][files.index(power)])
     if len(peaks) == 0:
-        peaks, properties = scipy.signal.find_peaks(-df[:, 1], height=0.0001, distance=1000, prominence=0.0001, width=200)
+        peaks, properties = scipy.signal.find_peaks(-df[:, 1], height=0.00001, distance=1000, prominence=0.00001, width=2000)
         #peaks, properties = scipy.signal.find_peaks(-df[:, 1], height=0.01, distance=1000, prominence=0.02, width=200)
         #for double photon 
     else:
         previous_peaks = peaks
-        peaks, properties = scipy.signal.find_peaks(-df[:, 1], height=0.0001, distance=1000, prominence=0.0001, width=200)
+        peaks, properties = scipy.signal.find_peaks(-df[:, 1], height=0.00001, distance=1000, prominence=0.00001, width=2000)
+        #cheeky maxima
+        peaks = [np.argmin(np.array(df[:, 1]), axis=0)]
         #peaks, properties = scipy.signal.find_peaks(-df[:, 1], height=0.01, distance=1000, prominence=0.02, width=200)
+        """
         if len(peaks) != len(previous_peaks):
             peaks = previous_peaks
+        """
+    print(peaks)
     plt.plot(df[:, 0], df[:, 1], label="Data")
     for i, peak in enumerate(peaks):
         if i == 2:
@@ -65,6 +72,8 @@ for power in files:
             popt, pcov = curve_fit(lambda x, height, width, pos, off, drift, extra_drift: peak_profile(x, height, width, pos, off, drift, extra_drift), df[:, 0], df[:, 1], p0=[2*df[peak, 1], df[peak, 1]/3, df[peak, 0], 0, 0, 0])
             previous_peaks = popt[2]
             plt.plot(df[:, 0], peak_profile(df[:, 0], *popt), label=f"Fit {peak}")
+            plt.vlines(df[peak, 0], ymin=np.min(df[:, 1]), ymax=np.max(df[:, 1]), colors='r', linestyles='dashed', label=f"Peak {peak}")
+            plt.vlines(df[min(peak, df.shape[0]-1), 0], ymin=np.min(df[:, 1]), ymax=np.max(df[:, 1]), colors='r', linestyles='dashed')
 
         except (RuntimeError, ValueError) as e:
             plt.close()
@@ -76,6 +85,7 @@ for power in files:
             continue
         heights.append(abs(popt[0]))
         widths.append(abs(popt[1]))
+
     plt.xlabel("Time [s]")
     plt.ylabel("Signal [V]")
     plt.title(f"Drive: {power.split('.')[0]} V")
@@ -94,7 +104,7 @@ if path.name == "big":
     popt, pcov = curve_fit(heights_model, voltages, heights, p0=[1, 0.5])
     y_fit = heights_model(voltages, *popt)
     plt.plot(voltages, y_fit, label="Heights Model Fit", linestyle="--")
-if path.name == "87" or path.name == "85":
+if path.name == "87" or path.name == "85" or path.name == "triple":
     #straight line
     #power law
     coeffs, cov = np.polyfit(np.log(voltages), np.log(heights), 1, cov=True)
@@ -109,7 +119,7 @@ plt.xlabel("Drive [V]")
 plt.xscale("log")
 plt.yscale("log")
 plt.ylabel(f"Heights [V]")
-plt.title(f"Heights vs Drive - Rb85")
+plt.title(f"Heights vs Drive - Triple Photon")
 plt.legend()
 plt.show()
 

@@ -89,5 +89,5 @@ Last day - 29/10
 
     Double photon - Needed to go 200kHz and to avoid overlap, 0.857 - 1.034 V sweep coil and, sweep time 50s
     weird exponent
-    Omg triple peaks - max gain, 20s sweep time, 300kHz, sweep field 0.623-0.454V
+    Omg triple peaks - max gain, 20s sweep time, 300kHz, sweep field 0.623-0.454V, 85 ig
     
