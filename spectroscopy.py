@@ -16,38 +16,86 @@ for col in df.columns:
     except ValueError:
         pass  # skip columns that contain text
 
-print(df)
-
 frequencies = df["f"].values
 base = df["base"].values
 conversion = 0.6/10 #s to Gauss
+conversion = 0.058
+time_of_sweep = 10.4 #0.05 = 0.5%
+mu_0 = 1.2566e-2 #in Gauss
+V = 0.995 #0.2%
+R = 1.0 #1% 
+B_max = (4/5)**(3/2)*11*(V/R)*mu_0/(0.1639) 
+print(B_max)
+conversion = B_max/time_of_sweep #all together ignore Hemholtz condition (good stability) and Radii uncertainty = 1.5%
+print(conversion)
 
 #constants
 mu_b = 9.274e-24 #J/T Bohr magneton
 h = 6.626e-34 #J*s Planck's constant
 
-fig, axes = plt.subplots(2, 2, figsize=(10, 8))
-axes = axes.flatten()
 
 peaks = ["small_plus", "small_minus", "big_plus", "big_minus"]
+
+peaks_label = [
+    r"$^{87}\mathrm{Rb}$",
+    r"$^{85}\mathrm{Rb}$",
+]
+
+peaks_colour = ["r", "g"]
+plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "serif",
+    "font.serif": ["Computer Modern"],
+    "axes.labelsize": 16,
+    "font.size": 16,
+    "legend.fontsize": 16,
+    "xtick.labelsize": 16,
+    "ytick.labelsize": 16,
+})
 for i, peak in enumerate(peaks):
     peak_values = df[peak].values
-    valid_freqs = [f for f in frequencies if peak_values[list(frequencies).index(f)] != -1]
-    peak_values = [(v-base[list(peak_values).index(v)])*conversion for v in peak_values if v != -1]
-    axes[i].plot(valid_freqs, peak_values, marker = "o",markersize=4, label=peak)
-    #fit straight line
-    coeffs = np.polyfit(valid_freqs[3:], peak_values[3:], 1)
-    fit_line = np.poly1d(coeffs)
-    print(coeffs[0])
-    axes[i].plot(valid_freqs, fit_line(valid_freqs), linestyle='--', label=f"{coeffs[0]/1e3:.2e}*f + {coeffs[1]}")
-    axes[i].grid()
-    #print(f"{peak} fit: B = {coeffs[0]/1e3:.4f}f + {coeffs[1]:.4f}")
-    print(f"{peak} g_F*m_F =", (h*1e3*1e4)/(coeffs[0]*mu_b))
-    axes[i].legend()
-    axes[i].set_title(f"{peak}     g_F*m_F = {(h*1e3*1e4)/(coeffs[0]*mu_b):.3f}")
-    axes[i].set_xlabel("Frequency [kHz]")
-    axes[i].set_ylabel("B field [G from the broad peak]")
+    valid_freqs = [f for f in frequencies if peak_values[list(frequencies).index(f)] != -1] #frequencies
+    peak_values = [(v-base[list(peak_values).index(v)])*conversion for v in peak_values if v != -1] #B field in G
 
-plt.suptitle("Frequency vs B field for different peaks")
+    coeffs, cov = np.polyfit(peak_values, valid_freqs, 1, cov = True)
+    fit_line = np.poly1d(coeffs)
+    plt.plot([0]+peak_values, fit_line([0]+peak_values), linestyle='--', color = peaks_colour[(i)//2], label = (peaks_label[i//2] if i % 2 == 0 else None))
+
+    # 1.5% error bars on B field
+    peak_err = [0.015 * p for p in peak_values]
+
+    # plot data with error bars
+    plt.errorbar(
+        peak_values,
+        valid_freqs,
+        xerr=peak_err,
+        fmt="+",
+        capsize=2,
+        markersize=4,
+        color = "black",
+        alpha = 0.5,
+        linestyle="none",
+    )
+    print(peak)
+    print("a", coeffs[0])
+    print("b", coeffs[1])
+    print("delta a", np.sqrt(cov[0,0]))
+    print("delta b", np.sqrt(cov[1,1]))
+    print(f"g_F = {(coeffs[0]*h*1e3*1e4)/(mu_b)} +- {(coeffs[0]*h*1e3*1e4)/(mu_b)*0.015}")
+
+
+#coeffs[0] = f/B
+#f"$f = {coeffs[0]:.1e}({np.sqrt(cov[0][0]):.1e})B + {coeffs[1]:.1e}({np.sqrt(cov[1][1]):.1e})$"
+plt.text(0.05, 180, r"$\mathbf{g_F^{(87+)} = +0.494(7)}$", color="black", fontsize=12)
+plt.text(0.18, 60, r"$\mathbf{g_F^{(85+)} = +0.329(5)}$", color="black", fontsize=12)
+plt.text(-0.28, 40, r"$\mathbf{g_F^{(85-)} = -0.330(5)}$", color="black", fontsize=12)
+plt.text(-0.20, 160, r"$\mathbf{g_F^{(87-)} = -0.495(7)}$", color="black", fontsize=12)
+
+
+plt.grid()
+plt.legend()
+plt.title(f"Zeeman Splitting vs Magnetic Field")
+plt.ylabel("Frequency [kHz]")
+plt.xlabel("B field [G]")
 plt.tight_layout()
 plt.show()
