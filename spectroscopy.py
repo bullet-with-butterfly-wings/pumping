@@ -99,3 +99,55 @@ plt.ylabel("Frequency [kHz]")
 plt.xlabel("B field [G]")
 plt.tight_layout()
 plt.show()
+
+
+#read the high_B.csv file and plot the data
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import find_peaks
+
+# --- Load and clean data ---
+df = pd.read_csv("power_broadening/100/20.csv", skiprows=2)
+df = df.apply(pd.to_numeric, errors='coerce').dropna().to_numpy()
+
+t = df[5000:, 0] * conversion
+signal = df[5000:, 1]
+
+# --- Find dips (negative peaks) ---
+peaks, _ = find_peaks(-signal, distance=1000, prominence=0.05)
+
+# --- Plot ---
+
+plt.figure(figsize=(6, 4))
+plt.plot(t, signal, color="orange", lw=1.2)
+plt.xlabel(r"$\Delta B\ \mathrm{[G]}$", fontsize=16)
+plt.ylabel(r"Signal\ [V]", fontsize=12)
+plt.ylim(bottom = -1.2)
+plt.title(r"\textbf{Spectroscopy}", fontsize=16)
+plt.tick_params(direction='in', top=True, right=True)
+
+# --- Peak labels ---
+labels = [
+    r"$^{85}\mathrm{Rb}(-)$",
+    r"$^{87}\mathrm{Rb}(-)$",
+    r"$B = 0$",
+    r"$^{87}\mathrm{Rb}(+)$",
+    r"$^{85}\mathrm{Rb}(+)$",
+
+]
+# Choose four most prominent peaks (sorted left to right)
+selected_peaks = sorted(peaks[np.argsort(t[peaks])[:5]])
+for i, p in enumerate(selected_peaks):
+    plt.text(
+        t[p],
+        signal[p] - 0.10,
+        labels[i],
+        ha='center',
+        va='bottom',
+        fontsize=16,
+        color='black'
+    )
+
+plt.tight_layout()
+plt.show()

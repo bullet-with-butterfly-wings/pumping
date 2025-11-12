@@ -7,7 +7,7 @@ from scipy.optimize import curve_fit
 from scipy.signal import argrelextrema
 
 
-path = Path("triple")  # Change to desired path
+path = Path("power_broadening/big")  # Change to desired path
 
 def sorting_key(file_name):
     name = file_name.split(".")[0].split("-")
@@ -19,8 +19,8 @@ def sorting_key(file_name):
         return int(name[0])
 
 files = sorted([f.name for f in path.glob("*.csv")], key=sorting_key, reverse=True)  # Sort by file name
-start_time = 8 #s
-end_time = 15 #s
+start_time = 0 #s
+end_time = 50 #s
 print(files)
 
 def peak_profile(x, height0, width0, pos0, offset, drift, extra_drift): #Lorentzian profile
