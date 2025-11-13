@@ -91,3 +91,5 @@ Last day - 29/10
     weird exponent
     Omg triple peaks - max gain, 20s sweep time, 300kHz, sweep field 0.623-0.454V, 85 ig
     
+
+For power broadening the important thing is 85, 87 (full range)
