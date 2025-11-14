@@ -50,7 +50,7 @@ def robust_mean(values, sigma_clip=2.0):
     return np.mean(values[mask])
 
 # store everything here
-"""
+
 results = {}
 
 for path in paths:
@@ -95,7 +95,7 @@ for path in paths:
 
             A_r, B_r, C_r, D_r, E_r = popt
             frequencies_sample.append(C_r / (2*np.pi))
-            lifetime_sample.append(1 / B_r)
+            lifetime_sample.append( B_r)
             if path.name == "rabi85":
                 amplitude_sample.append(5*abs(A_r))
             else:
@@ -381,3 +381,4 @@ plt.grid(True, alpha=0.3)
 plt.legend()
 plt.tight_layout()
 plt.show()
+"""

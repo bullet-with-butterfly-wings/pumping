@@ -155,14 +155,14 @@ plt.show()
 ####Widths
 mu_b = 9.274e-24 #J/T Bohr magneton
 h = 6.626e-34 #J*s Planck's constant
-conversion = {"85":1/3*(mu_b/h)*4.57e-7, "87": 1/2*(mu_b/h)*1.376e-7} #s to T
+conversion = {"85":1/3*(mu_b/h)*2.97e-7, "87": 1/2*(mu_b/h)*1.376e-7} #s to T
 for path in paths:
     widths[path.name] = np.asarray(widths[path.name],  dtype=float)*conversion[path.name]
     widths_err[path.name] = np.asarray(widths_err[path.name],  dtype=float)*conversion[path.name]
     plt.errorbar(voltages, widths[path.name], widths_err[path.name] , [1e-3 for v in voltages], fmt="+",
         capsize=2,
         markersize=6,
-        color = "black",#colours[path.name],
+        color = colours[path.name],
         alpha = 0.5,
         linestyle="none",)
 #fit
